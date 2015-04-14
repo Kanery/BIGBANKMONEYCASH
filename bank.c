@@ -14,10 +14,12 @@ typedef struct Bank{
 } bank;
 
 
-void deposit(acct account, float * amount){
+void deposit(acct account, float * amount)
+{
 	
 }
 
-void withdraw(acct account, float * amount){
+void withdraw(acct account, float * amount)
+{
 	
 }

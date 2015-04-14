@@ -9,7 +9,7 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
-//#include        <synch.h>
+#include        <synch.h>
 #include        <unistd.h>
 
 #define CLIENT_PORT	53245
