@@ -66,6 +66,11 @@ periodic_action_cycle_thread( void * ignore )
 		pthread_mutex_lock( &mutex );
 		printf( "There %s %d active %s.\n", ps( connection_count, "is", "are" ),
 			connection_count, ps( connection_count, "connection", "connections" ) );
+
+		/*pthread_mutex_lock(bank mutex here)
+		print all bank accts here
+		pthread_mutex_unlock(bankmutex here)
+		*/
 		pthread_mutex_unlock( &mutex );
 		sched_yield();					// necessary?
 	}
