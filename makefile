@@ -7,7 +7,7 @@ bank:	bank.o
 	$(CC) -pthread $(CFLAGS) -o bank bank.o
 
 bank.o:	bank.c bank.h
-	$(CC) -pthread $(CFLAGS) -c bank.c
+	$(CC) -pthread $(CFLAGS) -c bank.c bank.h
 
 server:	server.c
 	$(CC) -pthread $(CFLAGS) -o server server.c
