@@ -12,6 +12,7 @@
 /*#include        <synch.h>*/
 #include        <unistd.h>
 #include 	<ctype.h>
+#include 	"bank.h"
 
 #define CLIENT_PORT	53245
 
@@ -20,6 +21,8 @@ static pthread_attr_t	kernel_attr;
 static sem_t		actionCycleSemaphore;
 static pthread_mutex_t	mutex;
 static int		connection_count = 0;
+static struct bank*  myBank;
+
 
 static void
 set_iaddr( struct sockaddr_in * sockaddr, long x, unsigned int port )
@@ -265,6 +268,11 @@ main( int argc, char ** argv )
 {
 	pthread_t		tid;
 	char *			func = "server main";
+
+	myBank = (struct bank *) calloc (1, sizeof(struct bank));
+	myBank->accounts = (struct account *) calloc(MAX_ACCOUNTS, sizeof(struct account));
+	myBank->acmutex = (pthread_mutex_t *) calloc(MAX_ACCOUNTS, sizeof(pthread_mutex_t));
+	
 
 	if ( pthread_attr_init( &user_attr ) != 0 )
 	{

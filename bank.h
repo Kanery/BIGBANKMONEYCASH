@@ -1,20 +1,23 @@
-typedef struct Account
+#define MAX_ACCOUNTS = 20
+
+struct account
 {
         char * name;
         float bal;
         int sesFlag;
-} acct;
+};
 
-typedef struct Bank
+struct bank
 {
-        acct accounts[20];
-        pthread_mutex_t acmutex[20];
+        struct Account * accounts;
+        pthread_mutex_t* acmutex;
         pthread_mutex_t bankmutex;
 	int numAccounts;
-} bank;
+};
 
-void deposit(acct* account, float * amount);
-int withdraw(acct* account, float * amount);
-acct * create(char * name, float * bal);
-void serve(acct * account);
-float* query(acct * account);
+
+void deposit(struct account* , float * amount);
+int withdraw(struct account* , float * amount);
+struct account * create(char * name, float * bal);
+void serve(struct account * );
+float* query(struct account *);
