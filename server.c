@@ -72,7 +72,7 @@ periodic_action_cycle_thread( void * ignore )
 		printf( "There %s %d active %s.\n", ps( connection_count, "is", "are" ),
 			connection_count, ps( connection_count, "connection", "connections" ) );
 			
-		cyclePrint(connection_count);
+		cyclePrint(myBank->numAccounts);
 		/*pthread_mutex_lock(bank mutex here)
 		print all bank accts here
 		pthread_mutex_unlock(bankmutex here)
@@ -94,6 +94,8 @@ int cyclePrint(int count){
 			connection_count, ps( connection_count, "connection", "connections" ) );
 		for (i = 0; i < myBank->numAccounts; i++){
 
+			pthread_mutex_lock(&acMutex[i]);
+
 			//printf("Printing data for Client #%d\n", i+1);
 			printf("Client #%d - %s\n", i+1, myBank->accounts[i]->name);
 			printf("Available Balance: %d\n", myBank->accounts[i]->bal);
@@ -101,6 +103,8 @@ int cyclePrint(int count){
 				printf("Client %s is currently in session.\n", myBank->accounts[i]->name);
 			else
 				printf("Client %s is currently not in session.\n", myBank->accounts[i]->name);					
+
+			pthread_mutex_unlock(&acMutex[i]);
 
 		}
 		return 1; /* Has successfully printed out contents of accounts in bank. */
