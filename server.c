@@ -105,6 +105,8 @@ int cyclePrint(int count){
 				printf("Client %s is currently not in session.\n", myBank->accounts[i]->name);					
 
 			pthread_mutex_unlock(&acMutex[i]);
+			
+			printf("-------------------------\n");
 
 		}
 		return 1; /* Has successfully printed out contents of accounts in bank. */
