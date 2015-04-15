@@ -104,7 +104,8 @@ client_session_thread( void * arg )
 		printf( "server receives input:  %s\n", request );
 	
 		memset(response, '\0', sizeof(response));
-
+		strcpy(response, request);
+		
 		if (numArgs = sscanf(request, "%s %[^\n]\n", command, args), (numArgs == 0 || numArgs > 2))
 		{
 			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
@@ -134,9 +135,34 @@ client_session_thread( void * arg )
 				//Quit is here
 			}
 			else
-				strcpy(response, "Wrong command.  Type help to get it.");
+				strcpy(response, "Error.  Type help to get it.");
 		}
-		else if (
+		else if (numArgs == 2)
+		{
+			for (i = 0; i < strlen(command); i++)
+				command[i] = tolower(command[i]);
+
+			if (strcmp(command, "deposit") == 0)
+			{
+				strcmp(response, "Deposits.");			
+			}
+			else if (strcmp(command, "withdraw") == 0)
+			{
+				strcmp(response, "Withdraw.");			
+			}
+			else if (strcmp(command, "serve") == 0)
+			{
+				strcmp(response, "Serve.");			
+			}
+			else if (strcmp(command, "create") == 0)
+			{
+				strcmp(response, "Create.");			
+			}
+			else
+			{
+				strcmp(response, "Error- type help to get it.");
+			}
+		}
 		
 		/*size = strlen( request );
 		limit = strlen( request ) / 2;
@@ -148,7 +174,7 @@ client_session_thread( void * arg )
 			request[size - i - 1] = temp;
 		}*/
 		sleep(2);
-		write( sd, request, strlen(request) + 1 );
+		write( sd, response, strlen(response) + 1 );
 	}
 	close( sd );
 	pthread_mutex_lock( &mutex );
