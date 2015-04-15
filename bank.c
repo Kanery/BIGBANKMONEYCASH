@@ -16,11 +16,12 @@ int withdraw(acct* account, float * amount)
 		return -1;
 	else
 		account->bal -= (*amount);
+	return 1;
 }
 
 acct* create(char * name, float * bal)
 {
-	int i = 0;
+	/*int i = 0;*/
 	return 0;
 }
 
@@ -31,7 +32,7 @@ void serve(acct * account)
 
 float * query(acct * account)
 {
-	//mutex lock already in place
+	/*mutex lock already in place*/
 	float * ret = (float *)(malloc (sizeof (float)));
 	*ret = account->bal;
 	return ret;
@@ -39,5 +40,5 @@ float * query(acct * account)
 
 int main (int argc, char ** argv)
 {
-
+	return 0;
 }

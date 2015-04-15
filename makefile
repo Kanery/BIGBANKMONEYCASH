@@ -1,25 +1,25 @@
 CC = gcc
-CFLAGS = -ansi -pedantic -Wall -std=c99
+CFLAGS = -pedantic -Wall 
 
 all:bank server client
 
 bank:	bank.o
-	$(CC) -pthread $(CFLAGS) -o bank bank.o
+	$(CC) -lpthread $(CFLAGS) -o bank bank.o
 
 bank.o:	bank.c bank.h
-	$(CC) -pthread $(CFLAGS) -c bank.c 
+	$(CC) -lpthread $(CFLAGS) -c bank.c 
 
 server:	server.o
-	$(CC) -pthread $(CFLAGS) -o server server.o
+	$(CC) -lpthread $(CFLAGS) -o server server.o
 
 server.o: server.c
-	$(CC) -pthread $(CFLAGS) -c server.c
+	$(CC) -lpthread $(CFLAGS) -c server.c
 
 client: client.o
-	$(CC) -pthread $(CFLAGS) -o client client.o
+	$(CC) -lpthread $(CFLAGS) -o client client.o
 
 client.o: client.c
-	$(CC) -pthread $(CFLAGS) -c client.c
+	$(CC) -lpthread $(CFLAGS) -c client.c
 
 clean:
 	rm *.o

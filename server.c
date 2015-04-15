@@ -9,8 +9,9 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
-//#include        <synch.h>
+/*#include        <synch.h>*/
 #include        <unistd.h>
+#include 	<ctype.h>
 
 #define CLIENT_PORT	53245
 
@@ -40,7 +41,7 @@ periodic_action_handler( int signo, siginfo_t * ignore, void * ignore2 )
 {
 	if ( signo == SIGALRM )
 	{
-		sem_post( &actionCycleSemaphore );		// Perfectly safe to do ...
+		sem_post( &actionCycleSemaphore );		/* Perfectly safe to do ...*/
 	}
 }
 
@@ -50,19 +51,19 @@ periodic_action_cycle_thread( void * ignore )
 	struct sigaction	action;
 	struct itimerval	interval;
 
-	pthread_detach( pthread_self() );			// Don't wait for me, Argentina ...
+	pthread_detach( pthread_self() );			/* Don't wait for me, Argentina ...*/
 	action.sa_flags = SA_SIGINFO | SA_RESTART;
 	action.sa_sigaction = periodic_action_handler;
 	sigemptyset( &action.sa_mask );
-	sigaction( SIGALRM, &action, 0 );			// invoke periodic_action_handler() when timer expires
+	sigaction( SIGALRM, &action, 0 );			/* invoke periodic_action_handler() when timer expires*/
 	interval.it_interval.tv_sec = 20;
 	interval.it_interval.tv_usec = 0;
 	interval.it_value.tv_sec = 20;
 	interval.it_value.tv_usec = 0;
-	setitimer( ITIMER_REAL, &interval, 0 );			// every 20 seconds
+	setitimer( ITIMER_REAL, &interval, 0 );			/* every 20 seconds*/
 	for ( ;; )
 	{
-		sem_wait( &actionCycleSemaphore );		// Block until posted
+		sem_wait( &actionCycleSemaphore );		/* Block until posted*/
 		pthread_mutex_lock( &mutex );
 		printf( "There %s %d active %s.\n", ps( connection_count, "is", "are" ),
 			connection_count, ps( connection_count, "connection", "connections" ) );
@@ -72,7 +73,7 @@ periodic_action_cycle_thread( void * ignore )
 		pthread_mutex_unlock(bankmutex here)
 		*/
 		pthread_mutex_unlock( &mutex );
-		sched_yield();					// necessary?
+		sched_yield();					/* necessary?*/
 	}
 	return 0;
 }
@@ -83,30 +84,43 @@ client_session_thread( void * arg )
 	int			sd;
 	char			request[2048];
 	char			response[2048];
-	char			temp;
+	/*char			temp;*/
 	int			i;
+	
+	/*
 	int			limit, size;
 	float			ignore;
 	long			senderIPaddr;
 	char *			func = "client_session_thread";
+	*/
 
-	char *			command, args;
+	char 			command[100], args[100];
 	int 			numArgs;
 
 	sd = *(int *)arg;
-	free( arg );					// keeping to memory management covenant
-	pthread_detach( pthread_self() );		// Don't join on this thread
+	free( arg );					/* keeping to memory management covenant*/
+	pthread_detach( pthread_self() );		/* Don't join on this thread*/
 	pthread_mutex_lock( &mutex );
-	++connection_count;				// multiple clients protected access
+	++connection_count;				/* multiple clients protected access*/
 	pthread_mutex_unlock( &mutex );
 	while ( read( sd, request, sizeof(request) ) > 0 )
 	{
 		printf( "server receives input:  %s\n", request );
 	
 		memset(response, '\0', sizeof(response));
+		memset(command, '\0', sizeof(command));
+		memset(args, '\0', sizeof(command));
+
+		/*
+		printf("Reqeust is : %s\n", request);
+
 		strcpy(response, request);
 		
-		if (numArgs = sscanf(request, "%s %[^\n]\n", command, args), (numArgs == 0 || numArgs > 2))
+		printf("Reqeust is : %s\n", request);*/
+
+		numArgs = sscanf(request, "%s %s", command, args);
+		/*printf("Received request: %s. #: %d. cmd: %s. arg: %s\n", request, numArgs, command, args);*/
+		if (numArgs == 0 || numArgs > 2)
 		{
 			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
 		}
@@ -117,22 +131,22 @@ client_session_thread( void * arg )
 			if (strcmp(command, "query") == 0)
 			{
 				strcpy(response, "You gave me query.");
-				//Query code goes here.
+				/*Query code goes here.*/
 			}
 			else if (strcmp(command, "help") == 0)
 			{
-				strcpy(response, "You asked for help.");
-				//Help code goes here.
+				strcpy(response, "Commands: \n>Create accountname\n\n>Serve accountname\n\n>Deposit amount\n\n>Withdraw amount\n\n>Query\n\n>end\n\n>quit\n");
+				/*Help code goes here.*/
 			}
 			else if (strcmp(command, "end") == 0)
 			{
 				strcpy(response, "You wanted to end this session");
-				//End is here
+				/*End is here*/
 			}
 			else if (strcmp(command, "quit") == 0)
 			{
 				strcpy(response, "You wanted to quit this connection.");
-				//Quit is here
+				/*Quit is here*/
 			}
 			else
 				strcpy(response, "Error.  Type help to get it.");
@@ -144,24 +158,28 @@ client_session_thread( void * arg )
 
 			if (strcmp(command, "deposit") == 0)
 			{
-				strcmp(response, "Deposits.");			
+				strcpy(response, "Deposits.");			
 			}
 			else if (strcmp(command, "withdraw") == 0)
 			{
-				strcmp(response, "Withdraw.");			
+				strcpy(response, "Withdraw.");			
 			}
 			else if (strcmp(command, "serve") == 0)
 			{
-				strcmp(response, "Serve.");			
+				strcpy(response, "Serve.");			
 			}
 			else if (strcmp(command, "create") == 0)
 			{
-				strcmp(response, "Create.");			
+				strcpy(response, "Create.");			
 			}
 			else
 			{
-				strcmp(response, "Error- type help to get it.");
+				strcpy(response, "Error- type help to get it.");
 			}
+		}
+		else
+		{
+			strcpy(response, "Not sure what you want.\nType help.  Magical things happen.");
 		}
 		
 		/*size = strlen( request );
@@ -178,7 +196,7 @@ client_session_thread( void * arg )
 	}
 	close( sd );
 	pthread_mutex_lock( &mutex );
-	--connection_count;				// multiple clients protected access
+	--connection_count;				/* multiple clients protected access*/
 	pthread_mutex_unlock( &mutex );
 	return 0;
 }
@@ -226,7 +244,7 @@ session_acceptor_thread( void * ignore )
 		while ( (fd = accept( sd, (struct sockaddr *)&senderAddr, &ic )) != -1 )
 		{
 			fdptr = (int *)malloc( sizeof(int) );
-			*fdptr = fd;					// pointers are not the same size as ints any more.
+			*fdptr = fd;					/* pointers are not the same size as ints any more.*/
 			if ( pthread_create( &tid, &kernel_attr, client_session_thread, fdptr ) != 0 )
 			{
 				printf( "pthread_create() failed in %s()\n", func );
