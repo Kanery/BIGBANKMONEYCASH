@@ -96,8 +96,6 @@ int cyclePrint(int count){
 
 			pthread_mutex_lock(&acMutex[i]);
 
-			/*printf("Printing data for Client #%d\n", i+1);*/
-
 			printf("Client #%d - %s\n", i+1, myBank->accounts[i].name);
 			printf("Available Balance: %e\n", myBank->accounts[i].bal);
 			if ( myBank->accounts[i].sesFlag == 1)
