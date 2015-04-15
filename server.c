@@ -22,7 +22,8 @@ static sem_t		actionCycleSemaphore;
 static pthread_mutex_t	mutex;
 static int		connection_count = 0;
 static struct bank*  myBank;
-
+static pthread_mutex_t*	acMutex;
+static pthread_mutex_t  bankMutex;
 
 static void
 set_iaddr( struct sockaddr_in * sockaddr, long x, unsigned int port )
@@ -204,6 +205,11 @@ client_session_thread( void * arg )
 	return 0;
 }
 
+struct account getAccount(char * name)
+{
+	
+}
+
 void *
 session_acceptor_thread( void * ignore )
 {
@@ -268,10 +274,26 @@ main( int argc, char ** argv )
 {
 	pthread_t		tid;
 	char *			func = "server main";
+	int i = 0;
 
 	myBank = (struct bank *) calloc (1, sizeof(struct bank));
 	myBank->accounts = (struct account *) calloc(MAX_ACCOUNTS, sizeof(struct account));
-	myBank->acmutex = (pthread_mutex_t *) calloc(MAX_ACCOUNTS, sizeof(pthread_mutex_t));
+	myBank->numAccounts = 0;
+
+	if (pthread_mutex_init(&bankMutex, 0) != 0)
+	{
+		printf("Houston, we have a problem.\n");
+		return 1;
+	}
+
+	for (i = 0; i < MAX_ACCOUNTS; i++)
+	{
+		if (pthread_mutex_init(&acMutex[i], 0) != 0)
+		{
+			printf("Houston, we have a second problem.\n");
+			return 1;
+		}
+	}
 	
 
 	if ( pthread_attr_init( &user_attr ) != 0 )

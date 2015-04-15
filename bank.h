@@ -9,9 +9,7 @@ struct account
 
 struct bank
 {
-        struct account * accounts;
-        pthread_mutex_t* acmutex;
-        pthread_mutex_t bankmutex;
+        struct account* accounts;
 	int numAccounts;
 };
 
