@@ -21,3 +21,4 @@ int withdraw(struct account* , float * amount);
 struct account * create(char * name, float * bal);
 void serve(struct account * );
 float* query(struct account *);
+int cyclePrint(int count);

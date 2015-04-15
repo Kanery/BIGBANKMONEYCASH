@@ -70,7 +70,8 @@ periodic_action_cycle_thread( void * ignore )
 		pthread_mutex_lock( &mutex );
 		printf( "There %s %d active %s.\n", ps( connection_count, "is", "are" ),
 			connection_count, ps( connection_count, "connection", "connections" ) );
-
+			
+		cyclePrint(connection_count);
 		/*pthread_mutex_lock(bank mutex here)
 		print all bank accts here
 		pthread_mutex_unlock(bankmutex here)
@@ -79,6 +80,17 @@ periodic_action_cycle_thread( void * ignore )
 		sched_yield();					/* necessary?*/
 	}
 	return 0;
+}
+
+int cyclePrint(int count){
+	if ( count == 0){
+		printf("There are no accounts acrose any banks at this time.\n");
+		return 0;
+	}else{
+		printf("There %s %d active %s.\n", ps( connection_count, "is", "are" ),
+			connection_count, ps( connection_count, "connection", "connections" ) );
+		return 1;
+	}	
 }
 
 void *
