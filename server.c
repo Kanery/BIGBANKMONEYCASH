@@ -160,6 +160,8 @@ client_session_thread( void * arg )
 			for (i = 0; i < strlen(command); i++)
 				command[i] = tolower(command[i]);
 
+			
+
 			if (strcmp(command, "deposit") == 0)
 			{
 				strcpy(response, "Deposits.");			
@@ -205,9 +207,32 @@ client_session_thread( void * arg )
 	return 0;
 }
 
-struct account getAccount(char * name)
+
+/** Returns -2 on not found
+    Returns index on found
+    Returns -1 on error
+
+ASSUMPTION:: 
+*/
+int getAccount(char * name)
 {
-	
+	int i = 0;
+	if (name == NULL)
+		return -1;
+	else
+	{
+		for (; i < strlen(name); i++)
+		{
+			name[i] = tolower(name[i]);
+		}
+		for (i = 0; i < myBank->numAccounts; i++)
+		{
+			if (strcmp(myBank->accounts[i].name, name) == 0)
+				return i;
+		}
+		return -2; /*NOT FOUND*/
+	}
+				
 }
 
 void *
