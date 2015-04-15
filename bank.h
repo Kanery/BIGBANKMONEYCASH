@@ -3,18 +3,18 @@ typedef struct Account
         char * name;
         float bal;
         int sesFlag;
-
 } acct;
 
 typedef struct Bank
 {
-        acct[20] accounts;
-        pthread_mutex_t[20] acmutex;
-        pthread_mutex_t_ bankmutex;
+        acct accounts[20];
+        pthread_mutex_t acmutex[20];
+        pthread_mutex_t bankmutex;
+	int numAccounts;
 } bank;
 
-void deposit(acct account, float * amount);
-void withdraw(acct account, float * amount);
-void create(char * name, float * bal);
-void serve(char *);
-void query(acct account);
+void deposit(acct* account, float * amount);
+int withdraw(acct* account, float * amount);
+acct * create(char * name, float * bal);
+void serve(acct * account);
+float* query(acct * account);

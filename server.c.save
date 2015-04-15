@@ -90,8 +90,9 @@ client_session_thread( void * arg )
 	long			senderIPaddr;
 	char *			func = "client_session_thread";
 
-	char *			command, args;
-	int 			numArgs;
+	char *			command;
+	char *			args;
+	int			numArgs;
 
 	sd = *(int *)arg;
 	free( arg );					// keeping to memory management covenant
@@ -102,21 +103,22 @@ client_session_thread( void * arg )
 	while ( read( sd, request, sizeof(request) ) > 0 )
 	{
 		printf( "server receives input:  %s\n", request );
-	
 		memset(response, '\0', sizeof(response));
-
-		if (numArgs = sscanf(request, "%s %[^\n]\n", command, args), (numArgs == 0 || numArgs > 2))
+		
+		if (numArgs = sscanf(request, "%s %[^/n]/n", command, args), (numArgs == 0 || numArgs > 2))
 		{
-			strcpy(response, "Wrong arguments.  Type <help> to get appropriate syntax.");
+			strcpy(response, "You shall not pass! aka wrong arguments.  Type <help> to get appropriate syntax.");
 		}
 		else if (numArgs == 1)
 		{
 			
+			
 		}
 		
-		/*size = strlen( request );
-		limit = strlen( request ) / 2;
 
+		/*
+		size = strlen( request );
+		limit = strlen( request ) / 2;
 		for ( i = 0 ; i < limit ; i++ )
 		{
 			temp = request[i];
