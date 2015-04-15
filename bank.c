@@ -17,7 +17,7 @@ int withdraw(struct account* account, float * amount)
 	return 1;
 }
 
-struct bank * create(char * name, float * bal)
+struct account * create(char * name, float * bal)
 {
 	/*int i = 0;*/
 	return 0;

@@ -1,4 +1,4 @@
-#define MAX_ACCOUNTS = 20
+#define MAX_ACCOUNTS  20
 
 struct account
 {
@@ -9,7 +9,7 @@ struct account
 
 struct bank
 {
-        struct Account * accounts;
+        struct account * accounts;
         pthread_mutex_t* acmutex;
         pthread_mutex_t bankmutex;
 	int numAccounts;
