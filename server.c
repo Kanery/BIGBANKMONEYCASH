@@ -73,10 +73,7 @@ periodic_action_cycle_thread( void * ignore )
 			connection_count, ps( connection_count, "connection", "connections" ) );
 			
 		cyclePrint(myBank->numAccounts);
-		/*pthread_mutex_lock(bank mutex here)
-		print all bank accts here
-		pthread_mutex_unlock(bankmutex here)
-		*/
+
 		pthread_mutex_unlock( &mutex );
 		sched_yield();					/* necessary?*/
 	}
