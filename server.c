@@ -232,11 +232,6 @@ client_session_thread( void * arg )
 	return 0;
 }
 
-struct account getAccount(char * name)
-{
-	
-}
-
 void *
 session_acceptor_thread( void * ignore )
 {
