@@ -107,12 +107,36 @@ client_session_thread( void * arg )
 
 		if (numArgs = sscanf(request, "%s %[^\n]\n", command, args), (numArgs == 0 || numArgs > 2))
 		{
-			strcpy(response, "Wrong arguments.  Type <help> to get appropriate syntax.");
+			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
 		}
 		else if (numArgs == 1)
 		{
-			
+			for (i = 0; i < strlen(command); i++)
+				command[i] = tolower(command[i]);
+			if (strcmp(command, "query") == 0)
+			{
+				strcpy(response, "You gave me query.");
+				//Query code goes here.
+			}
+			else if (strcmp(command, "help") == 0)
+			{
+				strcpy(response, "You asked for help.");
+				//Help code goes here.
+			}
+			else if (strcmp(command, "end") == 0)
+			{
+				strcpy(response, "You wanted to end this session");
+				//End is here
+			}
+			else if (strcmp(command, "quit") == 0)
+			{
+				strcpy(response, "You wanted to quit this connection.");
+				//Quit is here
+			}
+			else
+				strcpy(response, "Wrong command.  Type help to get it.");
 		}
+		else if (
 		
 		/*size = strlen( request );
 		limit = strlen( request ) / 2;
