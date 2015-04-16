@@ -1,4 +1,5 @@
 #define MAX_ACCOUNTS  20
+#define BAL_CAP 9000000000000000
 
 struct account
 {
@@ -7,9 +8,11 @@ struct account
         int sesFlag;
 };
 
+typedef struct account * acct;
+
 struct bank
 {
-        struct account* accounts;
+        acct * accounts;
 	int numAccounts;
 };
 
