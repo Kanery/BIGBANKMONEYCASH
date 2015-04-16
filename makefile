@@ -4,13 +4,13 @@ CFLAGS = -pedantic -Wall
 all:server client
 
 bank.o:	bank.c bank.h
-	$(CC) -lpthread $(CFLAGS) -c bank.c 
+	$(CC) -lpthread $(CFLAGS) -c -g bank.c 
 
 server:	server.o bank.o
 	$(CC) -lpthread $(CFLAGS) -o server server.o 
 
 server.o: server.c
-	$(CC) -lpthread $(CFLAGS) -c server.c
+	$(CC) -lpthread $(CFLAGS) -c -g server.c
 
 client: client.o 
 	$(CC) -lpthread $(CFLAGS) -o client client.o

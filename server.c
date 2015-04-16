@@ -23,8 +23,30 @@ static pthread_mutex_t	mutex;
 static int		connection_count = 0;
 static struct bank*  	myBank;
 static const struct account	EmptyAccount = {NULL, 0, 0};
-static pthread_mutex_t*	acMutex;
-static pthread_mutex_t  bankMutex;
+static pthread_mutex_t	acMutex[MAX_ACCOUNTS] = 
+{
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER,	
+	PTHREAD_MUTEX_INITIALIZER
+};
+static pthread_mutex_t  bankMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static void
 set_iaddr( struct sockaddr_in * sockaddr, long x, unsigned int port )
@@ -350,7 +372,7 @@ main( int argc, char ** argv )
 	myBank = (struct bank *) calloc (1, sizeof(struct bank));
 	myBank->accounts = (struct account **) calloc(MAX_ACCOUNTS, sizeof(struct account*));
 	myBank->numAccounts = 0;
-
+/*
 	if (pthread_mutex_init(&bankMutex, 0) != 0)
 	{
 		printf("Houston, we have a problem.\n");
@@ -365,7 +387,7 @@ main( int argc, char ** argv )
 			return 1;
 		}
 	}
-	
+*/	
 
 	if ( pthread_attr_init( &user_attr ) != 0 )
 	{
