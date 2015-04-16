@@ -21,8 +21,7 @@ static pthread_attr_t	kernel_attr;
 static sem_t		actionCycleSemaphore;
 static pthread_mutex_t	mutex;
 static int		connection_count = 0;
-static struct bank*  	myBank;
-static const struct account	EmptyAccount = {NULL, 0, 0};
+static struct bank*  myBank;
 static pthread_mutex_t*	acMutex;
 static pthread_mutex_t  bankMutex;
 
@@ -101,9 +100,9 @@ client_session_thread( void * arg )
 
 	char 			command[100], args[100];
 	int 			numArgs;
-	struct account		curAccount = EmptyAccount;
+	struct account		curAccount;
 	int 			curAcctIndex;
-	int			curSessActive = 0;
+	int			curSessionActive =  0;
 
 	sd = *(int *)arg;
 	free( arg );					/* keeping to memory management covenant*/
@@ -136,47 +135,34 @@ client_session_thread( void * arg )
 		{
 			for (i = 0; i < strlen(command); i++)
 				command[i] = tolower(command[i]);
-
-			if (strcmp(command, "help") == 0)
+			if (strcmp(command, "query") == 0)
+			{
+				strcpy(response, "You gave me query.");
+				/*Query code goes here.*/
+			}
+			else if (strcmp(command, "help") == 0)
 			{
 				strcpy(response, "Commands: \n>Create accountname\n\n>Serve accountname\n\n>Deposit amount\n\n>Withdraw amount\n\n>Query\n\n>end\n\n>quit\n");
 				/*Help code goes here.*/
 			}
-			if (curSessActive)
+			else if (strcmp(command, "end") == 0)
 			{
-				if (strcmp(command, "query") == 0)
-				{
-					strcpy(response, "You gave me query.");
-					
-					/*Query code goes here.*/
-				}
-				else if (strcmp(command, "end") == 0)
-				{
-					strcpy(response, "You wanted to end this session");
-					curSessActive = 0;
-					/*End is here*/
-				}
-				else if (strcmp(command, "quit") == 0)
-				{
-					strcpy(response, "You wanted to quit this connection.");
-					break;
-					/*Quit is here*/
-				}
-				else
-					strcpy(response, "Error.  Type help to get it.");
+				strcpy(response, "You wanted to end this session");
+				/*End is here*/
+			}
+			else if (strcmp(command, "quit") == 0)
+			{
+				strcpy(response, "You wanted to quit this connection.");
+				/*Quit is here*/
 			}
 			else
-			{
-				/*if (strcmp(command*/
-			}
-				
+				strcpy(response, "Error.  Type help to get it.");
 		}
 		else if (numArgs == 2)
 		{
 			for (i = 0; i < strlen(command); i++)
 				command[i] = tolower(command[i]);
-
-			
+		
 			if (strcmp(command, "deposit") == 0)
 			{
 				strcpy(response, "Deposits.");			
