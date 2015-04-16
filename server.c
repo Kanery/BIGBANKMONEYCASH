@@ -22,7 +22,7 @@ static sem_t		actionCycleSemaphore;
 static pthread_mutex_t	mutex;
 static int		connection_count = 0;
 static struct bank*  	myBank;
-static const struct account	EmptyAccount = {NULL, 0, 0};
+static struct account	EmptyAccount = {NULL, 0, 0};
 static pthread_mutex_t	acMutex[MAX_ACCOUNTS] = 
 {
 	PTHREAD_MUTEX_INITIALIZER,	
@@ -151,9 +151,14 @@ client_session_thread( void * arg )
 
 	char 			command[100], args[100];
 	int 			numArgs;
-	struct account		curAccount = EmptyAccount;
-	int 			curAcctIndex;
-	int			curSessActive = 0;
+	struct account		*curAccount = (struct account *) malloc (sizeof(struct account));
+	int			curAcctIndex;
+	int			curSessActive;
+	float *			temp;
+
+	*curAccount = EmptyAccount;
+	curAcctIndex = -1;
+	curSessActive = 0;
 
 	sd = *(int *)arg;
 	free( arg );					/* keeping to memory management covenant*/
@@ -207,16 +212,16 @@ client_session_thread( void * arg )
 				{
 					strcpy(response, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
-					curAccount.sesFlag = 0;
-					curAccount = EmptyAccount;
+					curAccount->sesFlag = 0;
+					*curAccount = EmptyAccount;
 					/*End is here*/
 				}
 				else if (strcmp(command, "quit") == 0)
 				{
 					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
-					curAccount.sesFlag = 0;
-					curAccount = EmptyAccount;
+					curAccount->sesFlag = 0;
+					*curAccount = EmptyAccount;
 					break;
 					/*Quit is here*/
 				}
@@ -230,8 +235,8 @@ client_session_thread( void * arg )
 				{
 					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
-					curAccount.sesFlag = 0;
-					curAccount = EmptyAccount;
+					curAccount->sesFlag = 0;
+					*curAccount = EmptyAccount;
 					break;
 					/*Quit is here*/
 				}
@@ -249,6 +254,11 @@ client_session_thread( void * arg )
 			{	
 				if (strcmp(command, "deposit") == 0)
 				{
+					temp = (float *) malloc (sizeof(float));
+					if (sscanf(args, "%f", temp) != 1)
+						strcpy(response, "Please enter a valid deposit amount.\nType <help> to get add. info\n");
+					/*else*/
+						
 					strcpy(response, "Deposits.");			
 				}
 				else if (strcmp(command, "withdraw") == 0)
@@ -257,7 +267,11 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "serve") == 0)
 				{
-					strcpy(response, "Serve.");			
+					/*Since currSess is active, this means that
+					we are already in a client session, therefore,
+					we should not call serve.*/
+					
+					strcpy(response, "We are already serving you.  To end this session type end or <help>\n");			
 				}
 				else if (strcmp(command, "create") == 0)
 				{
@@ -272,6 +286,7 @@ client_session_thread( void * arg )
 			{
 
 			}
+		}
 		else
 		{
 			strcpy(response, "Not sure what you want.\nType help.  Magical things happen.");
