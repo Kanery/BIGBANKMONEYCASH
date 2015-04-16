@@ -8,11 +8,11 @@ struct account
         int sesFlag;
 };
 
-typedef struct account * acct;
+typedef struct account * accnt;
 
 struct bank
 {
-        acct * accounts;
+        accnt * accounts;
 	int numAccounts;
 };
 
