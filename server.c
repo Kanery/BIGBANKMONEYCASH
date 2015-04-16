@@ -172,7 +172,7 @@ client_session_thread( void * arg )
 			}
 			else
 			{
-				if (strcmp(command, "quit")
+				/*if (strcmp(command, "quit")*/
 			}
 				
 		}
@@ -247,7 +247,7 @@ int getAccount(char * name)
 		}
 		for (i = 0; i < myBank->numAccounts; i++)
 		{
-			if (strcmp(myBank->accounts[i].name, name) == 0)
+			if (strcmp(myBank->accounts[i]->name, name) == 0)
 				return i;
 		}
 		return -2; /*NOT FOUND*/
@@ -321,7 +321,7 @@ main( int argc, char ** argv )
 	char *			func = "server main";
 	int i = 0;
 
-	myBank = (struct bank *) calloc (1, sizeof(struct bank));
+	myBank = (struct bank **) calloc (1, sizeof(struct bank*));
 	myBank->accounts = (struct account *) calloc(MAX_ACCOUNTS, sizeof(struct account));
 	myBank->numAccounts = 0;
 
