@@ -179,13 +179,18 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "end") == 0)
 				{
-					strcpy(response, "You wanted to end this session");
+					strcpy(response, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
+					curAccount.sesFlag = 0;
+					curAccount = EmptyAccount;
 					/*End is here*/
 				}
 				else if (strcmp(command, "quit") == 0)
 				{
-					strcpy(response, "You wanted to quit this connection.");
+					strcpy(response, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
+					curSessActive = 0;
+					curAccount.sesFlag = 0;
+					curAccount = EmptyAccount;
 					break;
 					/*Quit is here*/
 				}
@@ -194,7 +199,7 @@ client_session_thread( void * arg )
 			}
 			else
 			{
-				/*if (strcmp(command*/
+				if (strcmp(command, "quit")
 			}
 				
 		}
