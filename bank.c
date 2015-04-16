@@ -2,30 +2,43 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "bank.h"
+#define BAL_CAP 9000000000000000
 
-void deposit(struct account* account, float * amount)
+int deposit(struct account* account, float * amount)
 {
-	account->bal += (*amount);
+	
+	if (account->bal + *amount >= BAL_CAP)
+		return 0; /*Balance will exceed our balance cap.*/ 
+	else{
+		account->bal += (*amount);
+		return 1; /*Successfully added amount to balance.*/
+	}
 }
 
 int withdraw(struct account* account, float * amount)
 {
 	if (account->bal < (*amount))
-		return -1;
-	else
+		return 0; /*User is trying to withdraw more than his balance contains.*/
+	else{
 		account->bal -= (*amount);
-	return 1;
+		return 1; /*Successful withdrawal.*/
+	}
 }
 
 struct account * create(char * name, float * bal)
 {
-	/*int i = 0;*/
-	return 0;
+	struct account newAcc = (account *)(calloc (sizeof (account)));
+
+	newAcc.name = name;
+	newAcc.bal = bal;
+	newAcc.sesFlag = 0;
+
+	return newAcc;
 }
 
 void serve(struct account * account)
 {
-	
+	account->sesFlag = 1;
 }
 
 float * query(struct account * account)

@@ -1,0 +1,8 @@
+* Can set a cap to balance, so long as we put it in our readme.
+	Useful for handling cases where we run out of space of doubles for balance.
+
+---
+Extra Credit Ideas
+ - Loan/Overdraw Balance
+ - Multiple Banks
+ - Implementing our tokenizer
