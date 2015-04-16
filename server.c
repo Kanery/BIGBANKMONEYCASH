@@ -95,7 +95,7 @@ int cyclePrint(int count){
 			pthread_mutex_lock(&acMutex[i]);
 
 			printf("Client #%d - %s\n", i+1, myBank->accounts[i]->name);
-			printf("Available Balance: %e\n", myBank->accounts[i]->bal);
+			printf("Available Balance: %g\n", *myBank->accounts[i]->bal);
 			if ( myBank->accounts[i]->sesFlag == 1)
 				printf("Client %s is currently in session.\n", myBank->accounts[i]->name);
 			else
@@ -347,8 +347,8 @@ main( int argc, char ** argv )
 	char *			func = "server main";
 	int i = 0;
 
-	myBank = (struct bank **) calloc (1, sizeof(struct bank*));
-	myBank->accounts = (struct account *) calloc(MAX_ACCOUNTS, sizeof(struct account));
+	myBank = (struct bank *) calloc (1, sizeof(struct bank));
+	myBank->accounts = (struct account **) calloc(MAX_ACCOUNTS, sizeof(struct account*));
 	myBank->numAccounts = 0;
 
 	if (pthread_mutex_init(&bankMutex, 0) != 0)

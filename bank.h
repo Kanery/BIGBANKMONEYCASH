@@ -4,7 +4,7 @@
 struct account
 {
         char * name;
-        float bal;
+        float* bal;
         int sesFlag;
 };
 
@@ -17,8 +17,8 @@ struct bank
 };
 
 
-void deposit(struct account* , float * amount);
-int withdraw(struct account* , float * amount);
+int deposit(struct account* , float *);
+int withdraw(struct account* , float *);
 struct account * create(char * name, float * bal);
 void serve(struct account * );
 float* query(struct account *);

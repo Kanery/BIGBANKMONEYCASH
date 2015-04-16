@@ -4,34 +4,34 @@
 #include "bank.h"
 #define BAL_CAP 9000000000000000
 
-int deposit(struct account* account, float * amount)
+int deposit(struct account* acc, float * amount)
 {
 	
-	if (account->bal + *amount >= BAL_CAP)
+	if (*acc->bal + *amount >= BAL_CAP)
 		return 0; /*Balance will exceed our balance cap.*/ 
 	else{
-		account->bal += (*amount);
+		*acc->bal += (*amount);
 		return 1; /*Successfully added amount to balance.*/
 	}
 }
 
 int withdraw(struct account* account, float * amount)
 {
-	if (account->bal < (*amount))
+	if (*account->bal < (*amount))
 		return 0; /*User is trying to withdraw more than his balance contains.*/
 	else{
-		account->bal -= (*amount);
+		*account->bal -= (*amount);
 		return 1; /*Successful withdrawal.*/
 	}
 }
 
 struct account * create(char * name, float * bal)
 {
-	struct account newAcc = (account *)(calloc (sizeof (account)));
+	accnt newAcc = (accnt)(calloc (1,sizeof (struct account)));
 
-	newAcc.name = name;
-	newAcc.bal = bal;
-	newAcc.sesFlag = 0;
+	newAcc->name = name;
+	newAcc->bal = bal;
+	newAcc->sesFlag = 0;
 
 	return newAcc;
 }
@@ -45,6 +45,6 @@ float * query(struct account * account)
 {
 	/*mutex lock already in place*/
 	float * ret = (float *)(malloc (sizeof (float)));
-	*ret = account->bal;
+	ret = account->bal;
 	return ret;
 }
