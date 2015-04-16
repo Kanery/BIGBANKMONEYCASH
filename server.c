@@ -138,6 +138,7 @@ client_session_thread( void * arg )
 	int			sd;
 	char			request[2048];
 	char			response[2048];
+	char			endResponse[2048];
 	/*char			temp;*/
 	int			i;
 	
@@ -160,6 +161,9 @@ client_session_thread( void * arg )
 	pthread_mutex_lock( &mutex );
 	++connection_count;				/* multiple clients protected access*/
 	pthread_mutex_unlock( &mutex );
+
+	memset(endResponse, '\0', sizeof(endResponse));
+
 	while ( read( sd, request, sizeof(request) ) > 0 )
 	{
 		printf( "server receives input:  %s\n", request );
@@ -209,7 +213,7 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "quit") == 0)
 				{
-					strcpy(response, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
+					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount.sesFlag = 0;
 					curAccount = EmptyAccount;
@@ -222,6 +226,17 @@ client_session_thread( void * arg )
 			else
 			{
 				/*if (strcmp(command, "quit")*/
+				if (strcmp(command, "quit") == 0)
+				{
+					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
+					curSessActive = 0;
+					curAccount.sesFlag = 0;
+					curAccount = EmptyAccount;
+					break;
+					/*Quit is here*/
+				}
+				else 
+					strcpy(response, "Not sure what you want.\nType help.  Magical things happen.\n");
 			}
 				
 		}
@@ -229,29 +244,34 @@ client_session_thread( void * arg )
 		{
 			for (i = 0; i < strlen(command); i++)
 				command[i] = tolower(command[i]);
-
 			
-			if (strcmp(command, "deposit") == 0)
-			{
-				strcpy(response, "Deposits.");			
-			}
-			else if (strcmp(command, "withdraw") == 0)
-			{
-				strcpy(response, "Withdraw.");			
-			}
-			else if (strcmp(command, "serve") == 0)
-			{
-				strcpy(response, "Serve.");			
-			}
-			else if (strcmp(command, "create") == 0)
-			{
-				strcpy(response, "Create.");			
+			if (curSessActive)
+			{	
+				if (strcmp(command, "deposit") == 0)
+				{
+					strcpy(response, "Deposits.");			
+				}
+				else if (strcmp(command, "withdraw") == 0)
+				{
+					strcpy(response, "Withdraw.");			
+				}
+				else if (strcmp(command, "serve") == 0)
+				{
+					strcpy(response, "Serve.");			
+				}
+				else if (strcmp(command, "create") == 0)
+				{
+					strcpy(response, "Create.");			
+				}
+				else
+				{
+					strcpy(response, "Error- type help to get it.");
+				}
 			}
 			else
 			{
-				strcpy(response, "Error- type help to get it.");
+
 			}
-		}
 		else
 		{
 			strcpy(response, "Not sure what you want.\nType help.  Magical things happen.");
@@ -269,6 +289,7 @@ client_session_thread( void * arg )
 		sleep(2);
 		write( sd, response, strlen(response) + 1 );
 	}
+	write(sd, endResponse, strlen(endResponse) + 1);
 	close( sd );
 	pthread_mutex_lock( &mutex );
 	--connection_count;				/* multiple clients protected access*/

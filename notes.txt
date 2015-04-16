@@ -1,6 +1,8 @@
 * Can set a cap to balance, so long as we put it in our readme.
 	Useful for handling cases where we run out of space of doubles for balance.
 
+* We can deposit/wd only floats but we can create and/or serve with numbers (because they might be actual acct numbers)
+
 ---
 Extra Credit Ideas
  - Loan/Overdraw Balance
