@@ -193,7 +193,7 @@ client_session_thread( void * arg )
 		{
 			for (i = 0; i < strlen(command); i++)
 				command[i] = tolower(command[i]);
-
+		
 			if (strcmp(command, "help") == 0)
 			{
 				strcpy(response, "Commands: \n>Create accountname\n\n>Serve accountname\n\n>Deposit amount\n\n>Withdraw amount\n\n>Query\n\n>end\n\n>quit\n");
@@ -318,7 +318,7 @@ client_session_thread( void * arg )
 					}
 					else
 					{		
-						pthread_mutex_lock(&bankMutex);
+						
 						pthread_mutex_lock(&acMutex[myBank->numAccounts]);
 						myBank->accounts[myBank->numAccounts] = (struct account *) calloc (1, sizeof(struct account));
 						myBank->accounts[myBank->numAccounts]->name = args;
@@ -326,7 +326,6 @@ client_session_thread( void * arg )
 						myBank->accounts[myBank->numAccounts]->sesFlag = 0;
 						pthread_mutex_unlock(&acMutex[myBank->numAccounts]);
 						myBank->numAccounts++;
-						pthread_mutex_unlock(&bankMutex);
 						strcpy(response, "Account opened name.\n Thank you for your business.\n");
 					}
 					pthread_mutex_unlock(&bankMutex);
