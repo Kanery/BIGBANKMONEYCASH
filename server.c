@@ -312,7 +312,21 @@ client_session_thread( void * arg )
 			}
 			else
 			{
-					
+				if (strcmp(command, serve) == 0){
+			
+					int accsub = getAccount(args);
+
+					if (accsub == -2)
+						strcpy(response, "Account is not found.\n")
+					else if (accsub == -1)
+						strcpy(response, "FATAL ERROR.\n");
+					else{
+
+						curAcctIndex = accsub;
+						curAccount = accounts[curAcctIndex];
+
+					}
+				}		
 			}
 		}
 		else
