@@ -24,3 +24,4 @@ void serve(struct account * );
 float* query(struct account *);
 int cyclePrint(int count);
 int getAccount(char * name);
+int claim_port (const char *);
