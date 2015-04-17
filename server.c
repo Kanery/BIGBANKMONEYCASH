@@ -123,7 +123,7 @@ int cyclePrint(int count){
 
 		}
 		return 1; /* Has successfully printed out contents of accounts in bank. */
-	}	
+		
 }
 
 void *

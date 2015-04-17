@@ -44,12 +44,12 @@ main( int argc, char ** argv )
 	int			len;
 	char *			func = "main";
 
-	if ( argc < 2 )
+	if ( argc < 2)
 	{
-		printf( "\x1b[2;31mMust specify server name on command line\x1b[0m\n" );
+		printf( "\x1b[2;31mMust specify server name and port number on command line\x1b[0m\n" );
 		return 1;
 	}
-	set_iaddr_str( &addr, argv[1], CLIENT_PORT );
+	set_iaddr_str( &addr, argv[1], CLIENT_PORT);
 	printf( "Connecting to server %s ...\n", argv[1] );
 	do {
 		errno = 0;
