@@ -75,7 +75,6 @@ main( int argc, char ** argv )
 			string[len]= '\0';
 			write( sd, string, strlen( string ) + 1 );
 			read( sd, buffer, sizeof(buffer) );
-			sprintf( output, "Result is >%s<\n", buffer );
 			write( 1, output, strlen(output) );
 		}
 	}
