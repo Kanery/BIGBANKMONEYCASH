@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "bank.h"
-#define BAL_CAP 9000000000000000
+#define BAL_CAP 9000000000000000 /*Which means our bank's maximum possible balance amount, for the sake of our program, will be set to this value.*/
 
 int deposit(struct account* acc, float * amount)
 {
 	
-	if (*acc->bal + *amount >= BAL_CAP)
+	if (*acc->bal + *amount > BAL_CAP)
 		return 0; /*Balance will exceed our balance cap.*/ 
 	else{
 		*acc->bal += (*amount);
@@ -15,12 +15,14 @@ int deposit(struct account* acc, float * amount)
 	}
 }
 
-int withdraw(struct account* account, float * amount)
+int withdraw(struct account* acc, float * amount)
 {
-	if (*account->bal < (*amount))
+	if (*acc->bal < (*amount))
 		return 0; /*User is trying to withdraw more than his balance contains.*/
+	else if (*amount > BAL_CAP)
+		return -1; /*User is trying to withdraw at or past the balance cap.*/	
 	else{
-		*account->bal -= (*amount);
+		*acc->bal -= (*amount);
 		return 1; /*Successful withdrawal.*/
 	}
 }

@@ -264,13 +264,29 @@ client_session_thread( void * arg )
 							strcpy(response, "Deposit amount is too large. It has to be verified.  It cannot be processed at this moment.\n We appreciate your business.\n Contact our investment broker at rutgers.cash.\n");
 						else
 						{
-							sprintf(response, "Deposit successful. Your current balance is %f.", *curAccount->bal);
+							sprintf(response, "Deposit successful. Your current balance is %f.\n", *curAccount->bal);
 						}
 					} 
 					strcpy(response, "Deposits.");			
 				}
 				else if (strcmp(command, "withdraw") == 0)
 				{
+					if (withdraw(curAccount, temp) == 0){
+	
+						strcpy(response, "You do not have enough funds to withdraw your specified amount.\n");
+					}
+					else if (withdraw(curAccount, temp) == -1){
+
+						strcpy(response, "You are currently trying to withdraw more than is possible from our bank.\n");
+
+					}	
+					else if (withdraw(curAccount, temp) == 1){
+
+						sprintf(response, "Withdrawal successful. Your current balance is %f.\n", *curAccount->bal);
+
+					}						
+
+
 					strcpy(response, "Withdraw.");			
 				}
 				else if (strcmp(command, "serve") == 0)
