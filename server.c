@@ -245,6 +245,10 @@ client_session_thread( void * arg )
 					break;
 					/*Quit is here*/
 				}
+				else if (strcmp(command, "help") == 0)
+				{
+					strcpy(response, "Commands: \n>Create accountname\n\n>Serve accountname\n\n>Deposit amount\n\n>Withdraw amount\n\n>Query\n\n>end\n\n>quit\n");
+				}
 				else 
 					strcpy(response, "Not sure what you want.\nType help.  Magical things happen.\n");
 			}
