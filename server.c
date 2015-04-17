@@ -1,3 +1,4 @@
+#include 	"bank.h"
 #include        <sys/time.h>
 #include        <sys/types.h>
 #include        <sys/socket.h>
@@ -12,7 +13,6 @@
 /*#include        <synch.h>*/
 #include        <unistd.h>
 #include 	<ctype.h>
-#include 	"bank.h"
 
 #define CLIENT_PORT	53245
 
@@ -151,7 +151,7 @@ client_session_thread( void * arg )
 
 	char 			command[100], args[100];
 	int 			numArgs;
-	struct account		*curAccount = (struct account *) malloc (sizeof(struct account));
+	struct account *	curAccount;
 	int			curAcctIndex;
 	int			curSessActive;
 	float *			temp;

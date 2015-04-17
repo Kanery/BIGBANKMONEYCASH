@@ -3,20 +3,20 @@ CFLAGS = -pedantic -Wall
 
 all:server client
 
-bank.o:	bank.c bank.h
-	$(CC) -lpthread $(CFLAGS) -c -g bank.c 
-
 server:	server.o bank.o
-	$(CC) -lpthread $(CFLAGS) -o server server.o 
+	$(CC) -lpthread $(CFLAGS) -o server server.o bank.o
 
 server.o: server.c bank.h
-	$(CC) -lpthread $(CFLAGS) -c -g server.c
+	$(CC) -lpthread $(CFLAGS) -c server.c 
 
-client: client.o 
-	$(CC) -lpthread $(CFLAGS) -o client client.o
+client: client.o bank.o
+	$(CC) -lpthread $(CFLAGS) -o client client.o bank.o
 
 client.o: client.c bank.h
 	$(CC) -lpthread $(CFLAGS) -c client.c
+
+bank.o:	bank.c bank.h
+	$(CC) -lpthread $(CFLAGS) -c bank.c 
 
 clean:
 	rm *.o
