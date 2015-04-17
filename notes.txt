@@ -3,6 +3,7 @@
 
 * We can deposit/wd only floats but we can create and/or serve with numbers (because they might be actual acct numbers)
 
+*Readme remind 100 character limit.
 ---
 Extra Credit Ideas
  - Loan/Overdraw Balance

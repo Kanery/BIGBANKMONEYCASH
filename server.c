@@ -152,11 +152,16 @@ client_session_thread( void * arg )
 	char 			command[100], args[100];
 	int 			numArgs;
 	struct account *	curAccount;
+	struct account *	emptyAcc;
 	int			curAcctIndex;
 	int			curSessActive;
 	float *			temp;
 
-	*curAccount = EmptyAccount;
+	emptyAcc = (accnt) malloc (sizeof(struct account));
+	emptyAcc->name = NULL;
+	emptyAcc->bal = NULL;
+	emptyAcc->sesFlag = 0;
+	curAccount = emptyAcc;
 	curAcctIndex = -1;
 	curSessActive = 0;
 
@@ -213,7 +218,7 @@ client_session_thread( void * arg )
 					strcpy(response, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
-					*curAccount = EmptyAccount;
+					curAccount = emptyAcc;
 					/*End is here*/
 				}
 				else if (strcmp(command, "quit") == 0)
@@ -221,7 +226,7 @@ client_session_thread( void * arg )
 					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
-					*curAccount = EmptyAccount;
+					curAccount = emptyAcc;
 					break;
 					/*Quit is here*/
 				}
@@ -236,7 +241,7 @@ client_session_thread( void * arg )
 					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
-					*curAccount = EmptyAccount;
+					curAccount = emptyAcc;
 					break;
 					/*Quit is here*/
 				}
@@ -265,6 +270,7 @@ client_session_thread( void * arg )
 						else
 						{
 							sprintf(response, "Deposit successful. Your current balance is %f.\n", *curAccount->bal);
+							printf("deposit response is %s..\n", response);
 						}
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					} 
@@ -272,7 +278,7 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "withdraw") == 0)
 				{		
-	
+
 					pthread_mutex_lock(&acMutex[curAcctIndex]);				
 					if (withdraw(curAccount, temp) == 0){
 	
@@ -303,7 +309,7 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "create") == 0)
 				{
-					strcpy(response, "Account cannot be created when not in session.\n");			
+					strcpy(response, "Account cannot be created when in session.\n");			
 				}
 				else
 				{
@@ -312,19 +318,50 @@ client_session_thread( void * arg )
 			}
 			else
 			{
-				if (strcmp(command, serve) == 0){
-			
+				if (strcmp(command, "create") == 0)
+				{	
+					int found = getAccount(args);
+					pthread_mutex_lock(&bankMutex);
+					if (strlen(args) > 100)
+						strcpy(response, "Please input your name UPTO 100 characters. Thank you!\n");
+					else if (myBank->numAccounts >= 20)
+					{
+						strcpy(response, "We are not accepting any new accounts at this time.  Thank you!\n");
+					}	
+					else if (found != -2 )
+					{
+						strcpy(response, "Are you trying to access your bank account?  Try serve <account name>\n");
+					}
+					else
+					{		
+						pthread_mutex_lock(&bankMutex);
+						pthread_mutex_lock(&acMutex[myBank->numAccounts]);
+						myBank->accounts[myBank->numAccounts] = (struct account *) calloc (1, sizeof(struct account));
+						myBank->accounts[myBank->numAccounts]->name = args;
+						myBank->accounts[myBank->numAccounts]->bal = (float *) calloc (1, sizeof(float));
+						myBank->accounts[myBank->numAccounts]->sesFlag = 0;
+						pthread_mutex_unlock(&acMutex[myBank->numAccounts]);
+						myBank->numAccounts++;
+						pthread_mutex_unlock(&bankMutex);
+						strcpy(response, "Account opened name.\n Thank you for your business.\n");
+					}
+					pthread_mutex_unlock(&bankMutex);
+				}
+				else if (strcmp(command, "serve") == 0)
+				{
 					int accsub = getAccount(args);
-
 					if (accsub == -2)
 						strcpy(response, "Account is not found.\n");
 					else if (accsub == -1)
 						strcpy(response, "FATAL ERROR.\n");
-					else{
-
+					else
+					{
+						curSessActive = 1;
 						curAcctIndex = accsub;
 						curAccount = myBank->accounts[curAcctIndex];
-
+						pthread_mutex_lock(&acMutex[curAcctIndex]);
+						curAccount->sesFlag = 1;
+						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					}
 				}		
 			}
@@ -343,6 +380,7 @@ client_session_thread( void * arg )
 			request[i] = request[size - i - 1];
 			request[size - i - 1] = temp;
 		}*/
+		printf("my current command is %s\n", command);
 		sleep(2);
 		write( sd, response, strlen(response) + 1 );
 	}
@@ -358,11 +396,12 @@ client_session_thread( void * arg )
     Returns index on found
     Returns -1 on error
 
-ASSUMPTION:: 
+ASSUMPTION:: There is no change of name 
 */
 int getAccount(char * name)
 {
 	int i = 0;
+	
 	if (name == NULL)
 		return -1;
 	else
@@ -446,10 +485,18 @@ main( int argc, char ** argv )
 	pthread_t		tid;
 	char *			func = "server main";
 	int i = 0;
+	accnt emptyAcc = (accnt) calloc (1, sizeof(struct account));
+	emptyAcc->name = NULL;
+	emptyAcc->bal = NULL;
+	emptyAcc->sesFlag = 0;
 
 	myBank = (struct bank *) calloc (1, sizeof(struct bank));
 	myBank->accounts = (struct account **) calloc(MAX_ACCOUNTS, sizeof(struct account*));
 	myBank->numAccounts = 0;
+	for (; i < MAX_ACCOUNTS; i++)
+	{
+		myBank->accounts[i] = emptyAcc;
+	}
 /*
 	if (pthread_mutex_init(&bankMutex, 0) != 0)
 	{
@@ -513,3 +560,4 @@ main( int argc, char ** argv )
 		pthread_exit( 0 );
 	}
 }
+
