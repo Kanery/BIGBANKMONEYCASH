@@ -269,7 +269,8 @@ client_session_thread( void * arg )
 					strcpy(response, "Deposits.");			
 				}
 				else if (strcmp(command, "withdraw") == 0)
-				{
+				{		
+
 					if (withdraw(curAccount, temp) == 0){
 	
 						strcpy(response, "You do not have enough funds to withdraw your specified amount.\n");
