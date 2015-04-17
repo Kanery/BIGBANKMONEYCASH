@@ -17,10 +17,8 @@ int deposit(struct account* acc, float * amount)
 
 int withdraw(struct account* acc, float * amount)
 {
-	if (*acc->bal < (*amount))
+	if (*acc->bal < (*amount) || (*amount > BAL_CAP))
 		return 0; /*User is trying to withdraw more than his balance contains.*/
-	else if (*amount > BAL_CAP)
-		return -1; /*User is trying to withdraw at or past the balance cap.*/	
 	else{
 		*acc->bal -= (*amount);
 		return 1; /*Successful withdrawal.*/
