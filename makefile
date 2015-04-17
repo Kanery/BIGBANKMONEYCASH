@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -pedantic -Wall 
+CFLAGS = -pedantic -Wall -Werror
 
 all:server client
 

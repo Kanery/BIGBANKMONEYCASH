@@ -10,9 +10,9 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
-/*#include        <synch.h>*/
 #include        <unistd.h>
 #include 	<ctype.h>
+#include 	<netdb.h>
 
 #define CLIENT_PORT	53245
 
@@ -182,18 +182,12 @@ client_session_thread( void * arg )
 		memset(command, '\0', sizeof(command));
 		memset(args, '\0', sizeof(command));
 
-		/*
-		printf("Reqeust is : %s\n", request);
-
-		strcpy(response, request);
-		
-		printf("Reqeust is : %s\n", request);*/
-
 		numArgs = sscanf(request, "%s %s", command, args);
 		printf("Received request: %s. #: %d. cmd: %s. arg: %s\n", request, numArgs, command, args);
 		if (numArgs == 0 || numArgs > 2)
 		{
 			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
+			write( sd, response, strlen(response) + 1 );
 		}
 		else if (numArgs == 1)
 		{
@@ -203,14 +197,17 @@ client_session_thread( void * arg )
 			if (strcmp(command, "help") == 0)
 			{
 				strcpy(response, "Commands: \n>Create accountname\n\n>Serve accountname\n\n>Deposit amount\n\n>Withdraw amount\n\n>Query\n\n>end\n\n>quit\n");
+				write( sd, response, strlen(response) + 1 );
 				/*Help code goes here.*/
 			}
 			if (curSessActive)
 			{
 				if (strcmp(command, "query") == 0)
 				{
-					strcpy(response, "You gave me query.");
-					
+					pthread_mutex_lock(&acMutex[curAcctIndex]);
+					sprintf(response, "You currently have $%f in your account %s.  Thank you for banking with us!\n", *(curAccount->bal), curAccount->name);
+					pthread_mutex_unlock(&acMutex[curAcctIndex]);
+
 					/*Query code goes here.*/
 				}
 				else if (strcmp(command, "end") == 0)
@@ -219,6 +216,7 @@ client_session_thread( void * arg )
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
 					curAccount = emptyAcc;
+
 					/*End is here*/
 				}
 				else if (strcmp(command, "quit") == 0)
@@ -232,6 +230,7 @@ client_session_thread( void * arg )
 				}
 				else
 					strcpy(response, "Error.  Type help to get it.");
+				write( sd, response, strlen(response) + 1 );
 			}
 			else
 			{
@@ -251,6 +250,7 @@ client_session_thread( void * arg )
 				}
 				else 
 					strcpy(response, "Not sure what you want.\nType help.  Magical things happen.\n");
+				write( sd, response, strlen(response) + 1 );
 			}
 				
 		}
@@ -279,6 +279,8 @@ client_session_thread( void * arg )
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					} 
 					strcpy(response, "Deposits.");			
+					write( sd, response, strlen(response) + 1 );
+
 				}
 				else if (strcmp(command, "withdraw") == 0)
 				{		
@@ -301,7 +303,7 @@ client_session_thread( void * arg )
 
 					pthread_mutex_unlock(&acMutex[curAcctIndex]);					
 
-					strcpy(response, "Withdraw.");			
+					write( sd, response, strlen(response) + 1 );
 				}
 				else if (strcmp(command, "serve") == 0)
 				{
@@ -310,14 +312,17 @@ client_session_thread( void * arg )
 					we should not call serve.*/
 					
 					strcpy(response, "We are already serving you.  To end this session type end or <help>\n");			
+					write( sd, response, strlen(response) + 1 );
 				}
 				else if (strcmp(command, "create") == 0)
 				{
 					strcpy(response, "Account cannot be created when in session.\n");			
+					write( sd, response, strlen(response) + 1 );
 				}
 				else
 				{
 					strcpy(response, "Error- type help to get it.");
+					write( sd, response, strlen(response) + 1 );
 				}
 			}
 			else
@@ -349,6 +354,7 @@ client_session_thread( void * arg )
 						strcpy(response, "Account opened name.\n Thank you for your business.\n");
 					}
 					pthread_mutex_unlock(&bankMutex);
+					write( sd, response, strlen(response) + 1 );
 				}
 				else if (strcmp(command, "serve") == 0)
 				{
@@ -364,32 +370,24 @@ client_session_thread( void * arg )
 						curAccount = myBank->accounts[curAcctIndex];
 						pthread_mutex_lock(&acMutex[curAcctIndex]);
 						curAccount->sesFlag = 1;
+						sprintf(response, "Currently serving %s\n", curAccount->name);
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					}
+					write( sd, response, strlen(response) + 1 );
 				}		
 				else
 				{
 					strcpy(response, "Invalid command.  Currently not in session.  Type help to see available options.\n");
+					write( sd, response, strlen(response) + 1 );
 				}
 			}
 		}
 		else
 		{
 			strcpy(response, "Not sure what you want.\nType help.  Magical things happen.");
+			write( sd, response, strlen(response) + 1 );
 		}
-		
-		/*size = strlen( request );
-		limit = strlen( request ) / 2;
-
-		for ( i = 0 ; i < limit ; i++ )
-		{
-			temp = request[i];
-			request[i] = request[size - i - 1];
-			request[size - i - 1] = temp;
-		}*/
-		/*printf("my current command is %s\n", command);*/
 		sleep(2);
-		write( sd, response, strlen(response) + 1 );
 	}
 	write(sd, endResponse, strlen(endResponse) + 1);
 	close( sd );
@@ -489,10 +487,15 @@ session_acceptor_thread( void * ignore )
 int
 main( int argc, char ** argv )
 {
-	pthread_t		tid;
-	char *			func = "server main";
-	int i = 0;
-	accnt emptyAcc = (accnt) calloc (1, sizeof(struct account));
+	pthread_t	tid;
+	char *		func = "server main";
+	int 		sockdesc;
+	int * 		sdptr;
+	int 		i;
+	accnt 		emptyAcc = (accnt) calloc (1, sizeof(struct account));
+	char		message[256];
+
+	i = 0;
 	emptyAcc->name = NULL;
 	emptyAcc->bal = NULL;
 	emptyAcc->sesFlag = 0;
@@ -504,33 +507,8 @@ main( int argc, char ** argv )
 	{
 		myBank->accounts[i] = emptyAcc;
 	}
-/*
-	if (pthread_mutex_init(&bankMutex, 0) != 0)
-	{
-		printf("Houston, we have a problem.\n");
-		return 1;
-	}
 
-	for (i = 0; i < MAX_ACCOUNTS; i++)
-	{
-		if (pthread_mutex_init(&acMutex[i], 0) != 0)
-		{
-			printf("Houston, we have a second problem.\n");
-			return 1;
-		}
-	}*/
-
-	/*if ( pthread_attr_init( &user_attr ) != 0 )
-	{
-		printf( "pthread_attr_init() failed in %s()\n", func );
-		return 0;
-	}*/
-	/*else if ( pthread_attr_setscope( &user_attr, PTHREAD_SCOPE_PROCESS ) != 0 )
-	{
-		printf( "pthread_attr_setscope() failed in %s() line %d\n", func, __LINE__ );
-		return 0;
-	}
-	else */if ( pthread_attr_init( &kernel_attr ) != 0 )
+	if ( pthread_attr_init( &kernel_attr ) != 0 )
 	{
 		printf( "pthread_attr_init() failed in %s()\n", func );
 		return 0;
@@ -538,6 +516,17 @@ main( int argc, char ** argv )
 	else if ( pthread_attr_setscope( &kernel_attr, PTHREAD_SCOPE_SYSTEM ) != 0 )
 	{
 		printf( "pthread_attr_setscope() failed in %s() line %d\n", func, __LINE__ );
+		return 0;
+	}
+	else if ( (sockdesc = claim_port( "53245" )) == -1)
+	{
+		write(1, message, sprintf(message, "\x1b[1;31mCould not bind to port %s errno %s\x1b[0m\n", "53245", strerror( errno) ) );\
+		return 1;
+	}	
+	else if ( listen(sockdesc, 100) == -1 )
+	{
+		printf( "listen() failed in file %s line %d\n", __FILE__, __LINE__ );
+		close( sockdesc );
 		return 0;
 	}
 	else if ( sem_init( &actionCycleSemaphore, 0, 0 ) != 0 )
@@ -550,7 +539,7 @@ main( int argc, char ** argv )
 		printf( "pthread_mutex_init() failed in %s()\n", func );
 		return 0;
 	}
-	else if ( pthread_create( &tid, &kernel_attr, session_acceptor_thread, 0 ) != 0 )
+	else if ( (*sdptr = sockdesc),  pthread_create( &tid, &kernel_attr, session_acceptor_thread, 0 ) != 0 )
 	{
 		printf( "pthread_create() failed in %s()\n", func );
 		return 0;
