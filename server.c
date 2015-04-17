@@ -367,6 +367,10 @@ client_session_thread( void * arg )
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					}
 				}		
+				else
+				{
+					strcpy(response, "Invalid command.  Currently not in session.  Type help to see available options.\n");
+				}
 			}
 		}
 		else
