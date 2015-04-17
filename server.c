@@ -254,11 +254,18 @@ client_session_thread( void * arg )
 			{	
 				if (strcmp(command, "deposit") == 0)
 				{
-					temp = (float *) malloc (sizeof(float));
+					temp = (float *) calloc (1,sizeof(float));
 					if (sscanf(args, "%f", temp) != 1)
 						strcpy(response, "Please enter a valid deposit amount.\nType <help> to get add. info\n");
-					/*else*/
-						
+					else
+					{
+						if (deposit(curAccount, temp) == 0)
+							strcpy(response, "Deposit amount is too large. It has to be verified.  It cannot be processed at this moment.\n We appreciate your business.\n Contact our investment broker at rutgers.cash.\n");
+						else
+						{
+							sprintf(response, "Deposit successful. Your current balance is %f.", *curAccount->bal);
+						}
+					} 
 					strcpy(response, "Deposits.");			
 				}
 				else if (strcmp(command, "withdraw") == 0)
