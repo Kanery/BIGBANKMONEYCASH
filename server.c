@@ -156,7 +156,7 @@ client_session_thread( void * arg )
 	int			curAcctIndex;
 	int			curSessActive;
 	float *			temp;
-	char 			tmpStr[100];
+	char * 			tmpStr;
 
 	emptyAcc = (accnt) malloc (sizeof(struct account));
 	emptyAcc->name = NULL;
@@ -217,16 +217,18 @@ client_session_thread( void * arg )
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
 					curAccount = emptyAcc;
-
+					
 					/*End is here*/
 				}
 				else if (strcmp(command, "quit") == 0)
 				{
-					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
+					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n--Quit Connection\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
 					curAccount = emptyAcc;
-					break;
+					write( sd, endResponse, strlen(endResponse) + 1 );
+					close(sd);
+					
 					/*Quit is here*/
 				}
 				else
@@ -238,11 +240,12 @@ client_session_thread( void * arg )
 				/*if (strcmp(command, "quit")*/
 				if (strcmp(command, "quit") == 0)
 				{
-					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n------------------------------------\n");
+					strcpy(endResponse, "--------------------------------\nThank you for banking with us.\nHave an awesome day!\n(BIG CASH MONEY BANK)\nVisit us at rutgers.cash\n--Quit session.\n------------------------------------\n");
 					curSessActive = 0;
 					curAccount->sesFlag = 0;
 					curAccount = emptyAcc;
-					break;
+					write(sd, endResponse, strlen(endResponse) + 1);
+					close(sd);
 					/*Quit is here*/
 				}
 				else if (strcmp(command, "help") == 0)
@@ -353,7 +356,7 @@ client_session_thread( void * arg )
 						
 						pthread_mutex_lock(&acMutex[myBank->numAccounts]);
 						myBank->accounts[myBank->numAccounts] = (struct account *) calloc (1, sizeof(struct account));
-						memset(tmpStr, '\0', sizeof(tmpStr));
+						tmpStr = (char *) calloc (101, sizeof(char));
 						strcpy(tmpStr, args);
 						myBank->accounts[myBank->numAccounts]->name = tmpStr;
 						myBank->accounts[myBank->numAccounts]->bal = (float *) calloc (1, sizeof(float));
