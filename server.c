@@ -263,6 +263,13 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "withdraw") == 0)
 				{
+					if (withdraw(curAccount, temp) == 0{
+					
+						strcpy(response, "
+
+					}							
+
+
 					strcpy(response, "Withdraw.");			
 				}
 				else if (strcmp(command, "serve") == 0)
