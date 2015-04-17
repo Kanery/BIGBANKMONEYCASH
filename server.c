@@ -190,7 +190,7 @@ client_session_thread( void * arg )
 		printf("Reqeust is : %s\n", request);*/
 
 		numArgs = sscanf(request, "%s %s", command, args);
-		/*printf("Received request: %s. #: %d. cmd: %s. arg: %s\n", request, numArgs, command, args);*/
+		printf("Received request: %s. #: %d. cmd: %s. arg: %s\n", request, numArgs, command, args);
 		if (numArgs == 0 || numArgs > 2)
 		{
 			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
@@ -379,7 +379,7 @@ client_session_thread( void * arg )
 			request[i] = request[size - i - 1];
 			request[size - i - 1] = temp;
 		}*/
-		printf("my current command is %s\n", command);
+		/*printf("my current command is %s\n", command);*/
 		sleep(2);
 		write( sd, response, strlen(response) + 1 );
 	}
@@ -510,20 +510,19 @@ main( int argc, char ** argv )
 			printf("Houston, we have a second problem.\n");
 			return 1;
 		}
-	}
-*/	
+	}*/
 
-	if ( pthread_attr_init( &user_attr ) != 0 )
+	/*if ( pthread_attr_init( &user_attr ) != 0 )
 	{
 		printf( "pthread_attr_init() failed in %s()\n", func );
 		return 0;
-	}
+	}*/
 	/*else if ( pthread_attr_setscope( &user_attr, PTHREAD_SCOPE_PROCESS ) != 0 )
 	{
 		printf( "pthread_attr_setscope() failed in %s() line %d\n", func, __LINE__ );
 		return 0;
-	}*/
-	else if ( pthread_attr_init( &kernel_attr ) != 0 )
+	}
+	else */if ( pthread_attr_init( &kernel_attr ) != 0 )
 	{
 		printf( "pthread_attr_init() failed in %s()\n", func );
 		return 0;
@@ -555,7 +554,7 @@ main( int argc, char ** argv )
 	}
 	else
 	{
-		printf( "server is ready to receive client connections ...\n" );
+		printf( "\n\t\tSERVER HAS BEEN ESTABLISHED.\n" );
 		pthread_exit( 0 );
 	}
 }
