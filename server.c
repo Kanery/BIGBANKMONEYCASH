@@ -317,13 +317,13 @@ client_session_thread( void * arg )
 					int accsub = getAccount(args);
 
 					if (accsub == -2)
-						strcpy(response, "Account is not found.\n")
+						strcpy(response, "Account is not found.\n");
 					else if (accsub == -1)
 						strcpy(response, "FATAL ERROR.\n");
 					else{
 
 						curAcctIndex = accsub;
-						curAccount = myBank.accounts[curAcctIndex];
+						curAccount = myBank->accounts[curAcctIndex];
 
 					}
 				}		
