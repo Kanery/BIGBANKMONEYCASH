@@ -259,14 +259,14 @@ client_session_thread( void * arg )
 						strcpy(response, "Please enter a valid deposit amount.\nType <help> to get add. info\n");
 					else
 					{
-						pthread_mutex_lock(&acmutex[curAcctIndex]);
+						pthread_mutex_lock(&acMutex[curAcctIndex]);
 						if (deposit(curAccount, temp) == 0)
 							strcpy(response, "Deposit amount is too large. It has to be verified.  It cannot be processed at this moment.\n We appreciate your business.\n Contact our investment broker at rutgers.cash.\n");
 						else
 						{
 							sprintf(response, "Deposit successful. Your current balance is %f.\n", *curAccount->bal);
 						}
-						pthread_mutex_unlock(&acmutex[curAcctIndex]);
+						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					} 
 					strcpy(response, "Deposits.");			
 				}
@@ -309,7 +309,17 @@ client_session_thread( void * arg )
 			}
 			else
 			{
-					
+				if (strcmp(command, "create") == 0)
+				{	
+					int found = getAccount(args);
+					if (strlen(args) > 100)
+						strcpy(response, "Please input your name UPTO 100 characters. Thank you!\n");
+					else if (found == -2 )
+					{
+						
+					}
+				}
+				
 			}
 		}
 		else
@@ -341,7 +351,7 @@ client_session_thread( void * arg )
     Returns index on found
     Returns -1 on error
 
-ASSUMPTION:: 
+ASSUMPTION:: There is no change of name 
 */
 int getAccount(char * name)
 {
