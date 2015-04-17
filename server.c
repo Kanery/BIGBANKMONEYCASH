@@ -156,6 +156,7 @@ client_session_thread( void * arg )
 	int			curAcctIndex;
 	int			curSessActive;
 	float *			temp;
+	char 			tmpStr[100];
 
 	emptyAcc = (accnt) malloc (sizeof(struct account));
 	emptyAcc->name = NULL;
@@ -329,6 +330,10 @@ client_session_thread( void * arg )
 			{
 				if (strcmp(command, "create") == 0)
 				{	
+					if (myBank->numAccounts >= 1)
+						printf("my account name is now %s\n", myBank->accounts[myBank->numAccounts-1]->name);
+					else
+						printf("No account created yet.\n");
 					int found = getAccount(args);
 					pthread_mutex_lock(&bankMutex);
 					if (strlen(args) > 100)
@@ -339,6 +344,8 @@ client_session_thread( void * arg )
 					}	
 					else if (found != -2 )
 					{
+						printf("I have a name %s at the %dth spot for bank->accounts\n", myBank->accounts[found]->name, found);
+						printf("I'm getting a value of %d for found.  Explain. \n", found);
 						strcpy(response, "Are you trying to access your bank account?  Try serve <account name>\n");
 					}
 					else
@@ -346,11 +353,14 @@ client_session_thread( void * arg )
 						
 						pthread_mutex_lock(&acMutex[myBank->numAccounts]);
 						myBank->accounts[myBank->numAccounts] = (struct account *) calloc (1, sizeof(struct account));
-						myBank->accounts[myBank->numAccounts]->name = args;
+						memset(tmpStr, '\0', sizeof(tmpStr));
+						strcpy(tmpStr, args);
+						myBank->accounts[myBank->numAccounts]->name = tmpStr;
 						myBank->accounts[myBank->numAccounts]->bal = (float *) calloc (1, sizeof(float));
 						myBank->accounts[myBank->numAccounts]->sesFlag = 0;
 						pthread_mutex_unlock(&acMutex[myBank->numAccounts]);
 						myBank->numAccounts++;
+						printf("myBank->numAccounts is now.. %d\n", myBank->numAccounts);
 						strcpy(response, "Account opened name.\n Thank you for your business.\n");
 					}
 					pthread_mutex_unlock(&bankMutex);
@@ -406,7 +416,7 @@ ASSUMPTION:: There is no change of name
 int getAccount(char * name)
 {
 	int i = 0;
-	
+	int found = -2;
 	if (name == NULL)
 		return -1;
 	else
@@ -415,30 +425,34 @@ int getAccount(char * name)
 		{
 			name[i] = tolower(name[i]);
 		}
-		for (i = 0; i < myBank->numAccounts; i++)
+		for (i = 0; i < MAX_ACCOUNTS; i++)
 		{
+			printf("at accounts[%d] i have ... %s\n", i, myBank->accounts[i]->name);
 			if (strcmp(myBank->accounts[i]->name, name) == 0)
-				return i;
+				found = i;
 		}
-		return -2; /*NOT FOUND*/
+		return found; /*NOT FOUND*/
 	}
 				
 }
 
 void *
-session_acceptor_thread( void * ignore )
+session_acceptor_thread( void * arg )
 {
 	int			sd;
 	int			fd;
 	int *			fdptr;
-	struct sockaddr_in	addr;
+	/*struct sockaddr_in	addr;*/
 	struct sockaddr_in	senderAddr;
 	socklen_t		ic;
 	pthread_t		tid;
-	int			on = 1;
+	/*int			on = 1;*/
 	char *			func = "session_acceptor_thread";
 
+	sd = *(int *)arg;
+
 	pthread_detach( pthread_self() );
+	/*
 	if ( (sd = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
 	{
 		printf( "socket() failed in %s()\n", func );
@@ -463,7 +477,7 @@ session_acceptor_thread( void * ignore )
 		return 0;
 	}
 	else
-	{
+	{*/
 		ic = sizeof(senderAddr);
 		while ( (fd = accept( sd, (struct sockaddr *)&senderAddr, &ic )) != -1 )
 		{
@@ -481,7 +495,7 @@ session_acceptor_thread( void * ignore )
 		}
 		close( sd );
 		return 0;
-	}
+	/*}*/
 }
 
 int
@@ -496,18 +510,22 @@ main( int argc, char ** argv )
 	char		message[256];
 
 	i = 0;
-	sdptr = NULL;
-	emptyAcc->name = NULL;
-	emptyAcc->bal = NULL;
+	sdptr = (int *) malloc (sizeof(int));
+	emptyAcc->name = "";
+	emptyAcc->bal = 0;
 	emptyAcc->sesFlag = 0;
 
+	pthread_mutex_lock(&bankMutex);
 	myBank = (struct bank *) calloc (1, sizeof(struct bank));
 	myBank->accounts = (struct account **) calloc(MAX_ACCOUNTS, sizeof(struct account*));
 	myBank->numAccounts = 0;
 	for (; i < MAX_ACCOUNTS; i++)
 	{
+		pthread_mutex_lock(&acMutex[i]);
 		myBank->accounts[i] = emptyAcc;
+		pthread_mutex_unlock(&acMutex[i]);
 	}
+	pthread_mutex_unlock(&bankMutex);
 
 	if ( pthread_attr_init( &kernel_attr ) != 0 )
 	{
@@ -540,7 +558,7 @@ main( int argc, char ** argv )
 		printf( "pthread_mutex_init() failed in %s()\n", func );
 		return 0;
 	}
-	else if ( (*sdptr = sockdesc),  pthread_create( &tid, &kernel_attr, session_acceptor_thread, 0 ) != 0 )
+	else if ( (*sdptr = sockdesc),  pthread_create( &tid, &kernel_attr, session_acceptor_thread, sdptr ) != 0 )
 	{
 		printf( "pthread_create() failed in %s()\n", func );
 		return 0;
