@@ -323,7 +323,7 @@ client_session_thread( void * arg )
 					else{
 
 						curAcctIndex = accsub;
-						curAccount = accounts[curAcctIndex];
+						curAccount = myBank.accounts[curAcctIndex];
 
 					}
 				}		
