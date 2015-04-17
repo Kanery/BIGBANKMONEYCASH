@@ -276,7 +276,7 @@ client_session_thread( void * arg )
 					}
 					else if (withdraw(curAccount, temp) == -1){
 
-						strcpy(response, "You are currently trying to withdraw more than is possible from our bank.\n")
+						strcpy(response, "You are currently trying to withdraw more than is possible from our bank.\n");
 
 					}	
 					else if (withdraw(curAccount, temp) == 1){
