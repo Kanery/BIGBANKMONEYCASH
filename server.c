@@ -106,26 +106,20 @@ periodic_action_cycle_thread( void * ignore )
 int cyclePrint(int count){
 	int i;
 
-	if ( count == 0){
-		printf("There are no accounts acrose any banks at this time.\n");
-		return 0; /* Nothing to print in bank. */
-	}else{
-		printf("There %s %d active %s.\n", ps( connection_count, "is", "are" ),
-			connection_count, ps( connection_count, "connection", "connections" ) );
-		for (i = 0; i < myBank->numAccounts; i++){
+	for (i = 0; i < myBank->numAccounts; i++){
 
-			pthread_mutex_lock(&acMutex[i]);
+		pthread_mutex_lock(&acMutex[i]);
 
-			printf("Client #%d - %s\n", i+1, myBank->accounts[i]->name);
-			printf("Available Balance: %g\n", *myBank->accounts[i]->bal);
-			if ( myBank->accounts[i]->sesFlag == 1)
-				printf("Client %s is currently in session.\n", myBank->accounts[i]->name);
-			else
-				printf("Client %s is currently not in session.\n", myBank->accounts[i]->name);					
+		printf("Client #%d - %s\n", i+1, myBank->accounts[i]->name);
+		printf("Available Balance: %g\n", *myBank->accounts[i]->bal);
+		if ( myBank->accounts[i]->sesFlag == 1)
+			printf("Client %s is currently in session.\n", myBank->accounts[i]->name);
+		else
+			printf("Client %s is currently not in session.\n", myBank->accounts[i]->name);					
 
-			pthread_mutex_unlock(&acMutex[i]);
+		pthread_mutex_unlock(&acMutex[i]);
 			
-			printf("-------------------------\n");
+		printf("-------------------------\n");
 
 		}
 		return 1; /* Has successfully printed out contents of accounts in bank. */
