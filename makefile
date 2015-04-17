@@ -9,13 +9,13 @@ bank.o:	bank.c bank.h
 server:	server.o bank.o
 	$(CC) -lpthread $(CFLAGS) -o server server.o 
 
-server.o: server.c
+server.o: server.c bank.h
 	$(CC) -lpthread $(CFLAGS) -c -g server.c
 
 client: client.o 
 	$(CC) -lpthread $(CFLAGS) -o client client.o
 
-client.o: client.c
+client.o: client.c bank.h
 	$(CC) -lpthread $(CFLAGS) -c client.c
 
 clean:
