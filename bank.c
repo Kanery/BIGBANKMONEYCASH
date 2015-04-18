@@ -7,7 +7,7 @@
 int deposit(struct account* acc, float * amount)
 {
 	
-	if (*acc->bal + *amount > BAL_CAP)
+	if ((*acc->bal + *amount) > BAL_CAP)
 		return 0; /*Balance will exceed our balance cap.*/ 
 	else{
 		*acc->bal += (*amount);

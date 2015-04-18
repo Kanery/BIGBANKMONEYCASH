@@ -282,7 +282,6 @@ client_session_thread( void * arg )
 						}
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					} 
-					strcpy(response, "Deposits.");			
 					write( sd, response, strlen(response) + 1 );
 
 				}
