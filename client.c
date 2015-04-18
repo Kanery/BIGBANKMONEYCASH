@@ -50,7 +50,7 @@ main( int argc, char ** argv )
 		return 1;
 	}
 	set_iaddr_str( &addr, argv[1], CLIENT_PORT );
-	printf( "Trying to connect to server.%s ...\n", argv[1] );
+	printf( "Trying to connect to server. %s ...\n", argv[1] );
 	do {
 		errno = 0;
 		if ( (sd = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
