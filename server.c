@@ -287,6 +287,7 @@ client_session_thread( void * arg )
 				}
 				else if (strcmp(command, "withdraw") == 0)
 				{		
+<<<<<<< HEAD
 					temp = (float *) calloc (1, sizeof(float));
 					if (sscanf(args, "%f", temp)  != 1)
 						strcpy(response, "Please enter a valid amount.\n");
@@ -305,6 +306,25 @@ client_session_thread( void * arg )
 						{
 							sprintf(response, "Withdrawal successful. Your current balance is %f.\n", *curAccount->bal);
 						}						
+=======
+
+					temp = (float *) calloc (1,sizeof(float));
+					if (sscanf(args, "%f", temp) != 1)
+						strcpy(response, "Please enter a valid withdrawal amount.\n");
+					else{
+						pthread_mutex_lock(&acMutex[curAcctIndex]);				
+						if (withdraw(curAccount, temp) == 0){
+	
+							strcpy(response, "You do not have enough funds to withdraw your specified amount.\n");
+						}
+						
+						else{
+	
+							sprintf(response, "Withdrawal successful. Your current balance is %f.\n", *curAccount->bal);
+
+						}						
+
+>>>>>>> 6e149bd31c90ff36ce15a2eafa2d14aa9352b92b
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);					
 					}
 					write( sd, response, strlen(response) + 1 );
