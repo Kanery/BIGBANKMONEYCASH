@@ -289,24 +289,24 @@ client_session_thread( void * arg )
 				else if (strcmp(command, "withdraw") == 0)
 				{		
 
-					pthread_mutex_lock(&acMutex[curAcctIndex]);				
-					if (withdraw(curAccount, temp) == 0){
+					temp = (float *) calloc (1,sizeof(float));
+					if (sscanf(args, "%f", temp) != 1)
+						strcpy(response, "Please enter a valid withdrawal amount.\n");
+					else{
+						pthread_mutex_lock(&acMutex[curAcctIndex]);				
+						if (withdraw(curAccount, temp) == 0){
 	
-						strcpy(response, "You do not have enough funds to withdraw your specified amount.\n");
+							strcpy(response, "You do not have enough funds to withdraw your specified amount.\n");
+						}
+						
+						else{
+	
+							sprintf(response, "Withdrawal successful. Your current balance is %f.\n", *curAccount->bal);
+
+						}						
+
+						pthread_mutex_unlock(&acMutex[curAcctIndex]);					
 					}
-					else if (withdraw(curAccount, temp) == -1){
-
-						strcpy(response, "You are currently trying to withdraw more than is possible from our bank.\n");
-
-					}	
-					else if (withdraw(curAccount, temp) == 1){
-
-						sprintf(response, "Withdrawal successful. Your current balance is %f.\n", *curAccount->bal);
-
-					}						
-
-					pthread_mutex_unlock(&acMutex[curAcctIndex]);					
-
 					write( sd, response, strlen(response) + 1 );
 				}
 				else if (strcmp(command, "serve") == 0)
