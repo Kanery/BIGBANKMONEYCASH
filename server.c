@@ -105,6 +105,9 @@ periodic_action_cycle_thread( void * ignore )
 
 int cyclePrint(int count){
 	int i;
+	int x = myBank->numAccounts;
+
+	printf("numAccounts = %d\n", x);
 
 	for (i = 0; i < myBank->numAccounts; i++){
 
@@ -116,7 +119,6 @@ int cyclePrint(int count){
 			printf("Client %s is currently in session.\n", myBank->accounts[i]->name);
 		else
 			printf("Client %s is currently not in session.\n", myBank->accounts[i]->name);					
-
 		pthread_mutex_unlock(&acMutex[i]);
 			
 		printf("-------------------------\n");
