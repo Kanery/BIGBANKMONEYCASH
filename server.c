@@ -157,6 +157,7 @@ client_session_thread( void * arg )
 	int			curSessActive;
 	float *			temp;
 	char * 			tmpStr;
+	int 			quitFlag = 0;
 
 	emptyAcc = (accnt) malloc (sizeof(struct account));
 	emptyAcc->name = NULL;
@@ -185,7 +186,7 @@ client_session_thread( void * arg )
 
 		numArgs = sscanf(request, "%s %s", command, args);
 		printf("Received request: %s. #: %d. cmd: %s. arg: %s\n", request, numArgs, command, args);
-		if (numArgs == 0 || numArgs > 2)
+		if (numArgs == 0 || numArgs > 2) /*This will never work*/
 		{
 			strcpy(response, "Wrong command or argument.  Type <help> to get appropriate syntax.");
 			write( sd, response, strlen(response) + 1 );
@@ -228,7 +229,7 @@ client_session_thread( void * arg )
 					curAccount = emptyAcc;
 					write( sd, endResponse, strlen(endResponse) + 1 );
 					close(sd);
-					
+					quitFlag = 1;
 					/*Quit is here*/
 				}
 				else
@@ -246,6 +247,7 @@ client_session_thread( void * arg )
 					curAccount = emptyAcc;
 					write(sd, endResponse, strlen(endResponse) + 1);
 					close(sd);
+					quitFlag = 1;
 					/*Quit is here*/
 				}
 				else if (strcmp(command, "help") == 0)
@@ -387,6 +389,7 @@ client_session_thread( void * arg )
 						else 
 						{
 							curAccount->sesFlag = 1;
+							strcpy(response, "Hello! Pleaseure to serve you today!\n");
 						}
 						pthread_mutex_unlock(&acMutex[curAcctIndex]);
 					}
@@ -406,8 +409,11 @@ client_session_thread( void * arg )
 		}
 		sleep(2);
 	}
-	write(sd, endResponse, strlen(endResponse) + 1);
-	close( sd );
+	if (quitFlag != 1)
+	{
+		write(sd, endResponse, strlen(endResponse) + 1);
+		close( sd );
+	}
 	pthread_mutex_lock( &mutex );
 	--connection_count;				/* multiple clients protected access*/
 	pthread_mutex_unlock( &mutex );
